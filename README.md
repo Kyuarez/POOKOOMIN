@@ -1,16 +1,10 @@
 # 🐾 뿌꾸민 – POOKOOMIN
 
+## 🎮 개요
 <div align="center">
   <img src="https://via.placeholder.com/600x300?text=SosoVillage+Game+Screenshot+or+Logo" alt="SosoVillage Game Screenshot or Logo">
 </div>
-
 닌텐도의 AR 게임 「피크민 블룸」을 보고 영감을 받아 만든 AR 게임입니다. 🌳
-
----
-
-## 🎮 개요
-
-SosoVillage는 일상에서 느낄 수 있는 부정적인 감정에서 벗어나 편안한 분위기 속에서 즐길 수 있는 힐링 게임을 만들고자 개발되었습니다.
 
 * **프로젝트 이름**: Pookoomin 🏠
 * **프로젝트 지속기간**: 2025.06.13 ~ 2025.06.27
