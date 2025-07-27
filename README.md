@@ -14,7 +14,7 @@
 ---
 
 ## 📖 게임 영상
-https://youtube.com/shorts/fPzQFjNRLDo?feature=share
+[![Video Label](https://youtube.com/shorts/fPzQFjNRLDo?feature=share/0.jpg)](https://youtube.com/shorts/fPzQFjNRLDo?feature=share)
 
 ---
 
