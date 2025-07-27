@@ -14,7 +14,7 @@
 ---
 
 ## 📖 게임 영상
-[![Pookoomin 소개 영상](http://img.youtube.com/vi/abcdefg1234/hqdefault.jpg)](https://youtube.com/shorts/fPzQFjNRLDo?feature=share)
+[![Game Demo](https://img.youtube.com/vi/fPzQFjNRLDo/0.jpg)](https://youtube.com/shorts/fPzQFjNRLDo)
 
 ---
 
