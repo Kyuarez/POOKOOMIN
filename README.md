@@ -22,6 +22,7 @@
 
 ### Google Static Map API
 ### 🚀 워크플로우: 현재 위치 기반 지도 로딩 과정
+```mermaid
 sequenceDiagram
     participant UnityApp
     participant GPSLocationService
@@ -41,11 +42,12 @@ sequenceDiagram
         UnityWebRequestTexture-->>GoogleStaticMapService: Texture2D 수신
         GoogleStaticMapService-->>UI: onComplete 콜백 → 지도 표시
     end
-
+```
 
 ---
 
 ### Google Fit API & Android Native Code(Java)
+```mermaid
 sequenceDiagram
     participant UnityCSharp
     participant AndroidJavaClass
@@ -70,7 +72,7 @@ sequenceDiagram
 
     UnityCSharp->>AndroidJavaClass: SaveImageToGallery()
     AndroidJavaClass->>AndroidMediaScanner: 저장 요청
-
+```
 
 
 ---
@@ -78,6 +80,7 @@ sequenceDiagram
 ### AR Foundation
 
 ### 🚀 워크플로우: AR 콘텐츠 인식 및 배치 과정
+```mermaid
 sequenceDiagram
     participant UnityApp
     participant ARContentManager
@@ -104,3 +107,4 @@ sequenceDiagram
 
     UnityApp->>ARContentManager: OnDisable()
     ARContentManager->>AllObjects: 리소스 정리
+```
