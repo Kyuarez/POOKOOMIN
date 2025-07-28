@@ -22,81 +22,85 @@
 
 ### Google Static Map API
 ### 🚀 워크플로우: 현재 위치 기반 지도 로딩 과정
-[Unity App Start]
-  -> [GPSLocationService] Init
-     -> [ILocationProvider] (Device/Simulated) 바인딩 & 준비 대기
-        -> 현재 위치 (mapOrigin) 설정
+sequenceDiagram
+    participant UnityApp
+    participant GPSLocationService
+    participant ILocationProvider
+    participant GoogleStaticMapService
+    participant UnityWebRequestTexture
+    participant UI
 
-[ILocationProvider] 위치 업데이트 (주기적)
-  -> [GPSLocationService] (onLocationUpdated)
-     -> 현재 위치 (latitude, longitude) 업데이트 (mapCenter)
-     -> [onMapRedraw] 이벤트 발생 (지도 재그리기 요청)
+    UnityApp->>GPSLocationService: Init
+    GPSLocationService->>ILocationProvider: 바인딩 및 초기화 대기
+    ILocationProvider-->>GPSLocationService: mapOrigin 설정
 
-[onMapRedraw] 이벤트 트리거
-  -> [GoogleStaticMapService] LoadMap(현재 위치, 줌, 크기) 호출
-     -> Google Static Map API URL 생성
-     -> [UnityWebRequestTexture] 이미지 비동기 다운로드
-     -> [Texture2D] 획득 &rarr; onComplete 콜백 호출
-
-[UI/Map Display Component]
-  -> [Texture2D] 수신
-     -> RawImage/Material에 할당 &rarr; 화면에 지도 표시
+    loop 위치 업데이트 주기
+        ILocationProvider-->>GPSLocationService: 위치 업데이트 (lat, lon)
+        GPSLocationService->>GoogleStaticMapService: onMapRedraw 이벤트
+        GoogleStaticMapService->>UnityWebRequestTexture: 이미지 요청
+        UnityWebRequestTexture-->>GoogleStaticMapService: Texture2D 수신
+        GoogleStaticMapService-->>UI: onComplete 콜백 → 지도 표시
+    end
 
 
+---
 
 ### Google Fit API & Android Native Code(Java)
+sequenceDiagram
+    participant UnityCSharp
+    participant AndroidJavaClass
+    participant GoogleFitActivity
+    participant GoogleFitJava
+    participant UnityGameLogic
 
-[Android Studio] .aar 플러그인 개발
+    UnityCSharp->>AndroidJavaClass: RequestGoogleFitOAuth()
+    AndroidJavaClass->>GoogleFitActivity: Start Intent
+    GoogleFitActivity->>GoogleFitJava: 권한 요청 & OAuth
+    GoogleFitJava->>GoogleFitJava: subscribeSensor()
+    GoogleFitJava-->>UnityGameLogic: UnitySendMessage(걸음 수)
 
-1.  **갤러리 (`gallery.java`)**
-    * `getFirstImage()`: 갤러리 쿼리 &rarr; 최신 이미지 `Bitmap` &rarr; **Base64** 인코딩 &rarr; Unity 반환
-    * `openGallery()`: `Intent.ACTION_VIEW` &rarr; **갤러리 앱 실행**
+    Note over UnityGameLogic: 걸음 수 UI 업데이트 등
 
-2.  **Google Fit (`googleFit.java`, `googleFitPermissionActivity.java`)**
-    * `googleFitPermissionActivity` Start: `ACTIVITY_RECOGNITION` 권한 요청 &rarr; Google Fit OAuth 진행
-    * OAuth 성공 시: `googleFit.subscribeSensor()` 호출
-    * `subscribeSensor()`: `FitnessOptions` (걸음 수 읽기) 정의 &rarr; `SensorsClient.add()` &rarr; **누적 걸음 수 센서 구독**
-    * 센서 데이터 수신 (주기적) &rarr; `UnityPlayer.UnitySendMessage` (Reflection) &rarr; Unity로 걸음 수 데이터 전송
+    UnityCSharp->>AndroidJavaClass: LoadThumbnailToGallery()
+    AndroidJavaClass->>gallery.java: getFirstImage()
+    gallery.java-->>UnityCSharp: Base64 → Texture2D
 
-[Unity Editor]
-  -> .aar 파일 `Assets/Plugins/Android`에 추가 & Manifest/Gradle 설정
+    UnityCSharp->>AndroidJavaClass: OpenGallery()
+    AndroidJavaClass->>gallery.java: openGallery()
 
-[Unity C# 코드]
-1.  **Google Fit 요청 (`GoogleFitUtil.cs`)**
-    * `RequestGoogleFitOAuth()` &rarr; `AndroidJavaClass` (`UnityPlayer`, `currentActivity`)
-    * 새 `Intent` &rarr; `googleFitPermissionActivity` 시작 (권한/로그인 플로우 시작)
+    UnityCSharp->>AndroidJavaClass: SaveImageToGallery()
+    AndroidJavaClass->>AndroidMediaScanner: 저장 요청
 
-2.  **갤러리 접근 (`PictureUtil.cs`)**
-    * `LoadThumbnailToGallery()` &rarr; `AndroidJavaClass` (`gallery`) &rarr; `CallStatic("getFirstImage")` &rarr; Base64 수신 &rarr; `Texture2D` 변환
-    * `OpenGallery()` &rarr; `gallery.CallStatic("openGallery")` &rarr; 갤러리 앱 실행
-    * `SaveImageToGallery()` &rarr; Android 미디어 스캐너 `Intent` &rarr; 갤러리 저장
 
-[Unity Game Logic]
-  -> Unity C# 스크립트 &larr; `UnitySendMessage`를 통해 Google Fit 걸음 수 데이터 수신 (e.g., UI 업데이트, 보상)
-  -> 갤러리 이미지 (`Texture2D`) &rarr; 게임 내 UI에 활용 (e.g., 프로필 사진)
 
 ---
 
 ### AR Foundation
 
 ### 🚀 워크플로우: AR 콘텐츠 인식 및 배치 과정
-[Unity App Start/AR Mode Activate]
-  -> [ARContentManager] Init & Enable
-     -> [ARPlaneManager], [ARRaycastManager] 활성화
-     -> 펫 프리팹 로드
+sequenceDiagram
+    participant UnityApp
+    participant ARContentManager
+    participant User
+    participant ARRaycastManager
+    participant GroundPrefab
+    participant PetAgent
 
-[User Interaction] PlaceObjectAtCenter() 호출
-  -> 화면 중앙 &rarr; [ARRaycastManager] &rarr; AR 평면 레이캐스트
+    UnityApp->>ARContentManager: Init & Enable
+    ARContentManager->>ARRaycastManager: 활성화
 
-[레이캐스트 성공]
-  -> **최초 배치 시:**
-     -> `groundPrefab` 인스턴스화 &rarr; [NavMeshSurface] **NavMesh 빌드** (다음 프레임)
-     -> `agentPrefab` (펫) 인스턴스화 &rarr; 펫에 [NavMeshAgent] 추가
-     -> 펫 초기 시선 AR 카메라로 설정
-  -> **후속 배치 시:**
-     -> `_instanceGround` 새 위치로 이동 &rarr; NavMesh 재빌드
-     -> [NavMeshAgent] `SetDestination()` &rarr; 펫 이동 명령
-     -> 펫 목표 도달 시 &rarr; 펫 시선 AR 카메라로 조정
+    User->>ARRaycastManager: PlaceObjectAtCenter()
+    ARRaycastManager-->>ARContentManager: Raycast hit
 
-[ARContentManager] OnDisable()
-  -> 펫, 바닥 파괴 & 모든 AR 평면 비활성화 (리소스 정리)
+    alt 최초 배치
+        ARContentManager->>GroundPrefab: 인스턴스화 & NavMesh Build
+        ARContentManager->>PetAgent: 인스턴스화 & NavMeshAgent 추가
+        PetAgent->>ARCamera: 시선 설정
+    else 후속 배치
+        ARContentManager->>GroundPrefab: 위치 이동 & NavMesh 재빌드
+        ARContentManager->>PetAgent: SetDestination()
+        PetAgent->>ARCamera: 목표 도달 → 시선 설정
+    end
+
+    UnityApp->>ARContentManager: OnDisable()
+    ARContentManager->>AllObjects: 리소스 정리
