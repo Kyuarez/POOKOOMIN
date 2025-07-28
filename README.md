@@ -22,6 +22,14 @@
 
 ### Google Static Map API
 ### 🚀 워크플로우: 현재 위치 기반 지도 로딩 과정
+게임을 실행하면, 실행한 디바이스에 따라 프로바이더 결정한다.
+- 에디터에서는, 현재 위치를 결정할 수 없으므로 직접 플레이어를 Input으로 움직이며 위치 갱신한다.
+- 디바이스에서는, 현재 위도, 경도 값을 받아서 실제 위치를 전송한다.
+
+매 업데이트 문마다, 현재 위치를 갱신 시켜서 Google Static Map API로 지도 값 요청
+
+지도값을 텍스쳐로 받아서, 플레이어를 중심으로 9칸 이미지를 갱신한다.
+ 
 ```mermaid
 sequenceDiagram
     participant UnityApp
@@ -37,16 +45,8 @@ sequenceDiagram
 
     loop 위치 업데이트 주기
         ILocationProvider-->>GPSLocationService: 위치 업데이트 (lat, lon)
-        GPSLocationService->>GoogleStaticMapService: onMapRedraw 이벤트
-        GoogleStaticMapService->>UnityWebRequestTexture: 이미지 요청
-        UnityWebRequestTexture-->>GoogleStaticMapService: Texture2D 수신
-        GoogleStaticMapService-->>UI: onComplete 콜백 → 지도 표시
-    end
-```
+       조
 
----
-
-### Google Fit API & Android Native Code(Java)
 ```mermaid
 sequenceDiagram
     participant UnityCSharp
