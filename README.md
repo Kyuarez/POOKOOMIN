@@ -123,3 +123,59 @@ sequenceDiagram
     UnityApp->>ARContentManager: OnDisable()
     ARContentManager->>AllObjects: 리소스 정리
 ```
+
+### UI : MVC
+ UI 구조 (MVC 패턴)
+Pookoomin 프로젝트는 Unity 기반 UI 시스템에 MVC (Model-View-Controller) 패턴을 도입하여 유지보수성과 테스트 용이성을 높였습니다.
+
+Model (ObservableModel<T>)
+값 변경 시 이벤트를 발생시키는 데이터 모델.
+뷰에 직접 접근하지 않고 데이터 변경만 관리합니다.
+
+View (UIView)
+Unity MonoBehaviour를 상속한 UI 요소입니다.
+모델의 변화에 따라 UI를 갱신하며, 사용자 입력을 컨트롤러로 전달합니다.
+
+Controller (UIController<View, Model>)
+모델과 뷰를 연결하며, 입력 처리 및 모델 → 뷰 바인딩을 담당합니다.
+
+Factory (UIControllerFactory)
+DI 없이 컨트롤러를 생성/캐싱/제거하는 팩토리 클래스입니다.
+
+```mermaid
+classDiagram
+    class ObservableModel~T~ {
+        - T _value
+        + T Value
+        + event PropertyChanged
+    }
+
+    class INotifyPropertyChanged~T~ {
+        + event PropertyChanged
+    }
+
+    ObservableModel~T~ --|> INotifyPropertyChanged~T~
+
+    class UIView {
+        + Initialize(anchor)
+        + CloseUI(isCloseAll)
+    }
+
+    class UIController~View, Model~ {
+        - View view
+        - Model model
+        + BindInputEvents()
+        + BindModelToView()
+    }
+
+    class UIControllerFactory {
+        - controllerDict : Dictionary<UIView, object>
+        + GetOrCreateController<TController, TView, TModel>()
+        + RemoveController(view)
+    }
+
+    UIControllerFactory --> UIController
+    UIController --> UIView
+    UIController --> ObservableModel
+
+```
