@@ -125,9 +125,6 @@ sequenceDiagram
 ```
 
 ### UI : MVC
- UI 구조 (MVC 패턴)
-Pookoomin 프로젝트는 Unity 기반 UI 시스템에 MVC (Model-View-Controller) 패턴을 도입하여 유지보수성과 테스트 용이성을 높였습니다.
-
 Model (ObservableModel<T>)
 값 변경 시 이벤트를 발생시키는 데이터 모델.
 뷰에 직접 접근하지 않고 데이터 변경만 관리합니다.
