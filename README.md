@@ -45,10 +45,23 @@ sequenceDiagram
 
     loop 위치 업데이트 주기
         ILocationProvider-->>GPSLocationService: 위치 업데이트 (lat, lon)
-       조
+        GPSLocationService->>GoogleStaticMapService: onMapRedraw 이벤트
+        GoogleStaticMapService->>UnityWebRequestTexture: 이미지 요청
+        UnityWebRequestTexture-->>GoogleStaticMapService: Texture2D 수신
+        GoogleStaticMapService-->>UI: onComplete 콜백 → 지도 표시
+    end
+
 ```
 
 ### Google Static Map API
+🚀 워크플로우: Google Fit 권한 요청 및 걸음 수 동기화, 갤러리 접근
+Unity에서 Java 클래스를 호출하여 Google Fit 권한 요청 및 센서 등록을 진행합니다.
+(개별 자바 클래스는 안드로이드 스튜디오 외부 라이브러리로 제작해서 aar 파일 형태로 빌드 :: 외부 플러그인)
+
+걸음 수 데이터는 UnitySendMessage를 통해 유니티로 전달되어 게임 로직과 UI에 반영됩니다.
+
+갤러리 접근 기능은 Java 측에서 이미지 조회/앱 실행/저장 기능을 제공하며 Unity와 연동됩니다.
+
 ```mermaid
 sequenceDiagram
     participant UnityCSharp
