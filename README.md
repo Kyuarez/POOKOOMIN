@@ -46,7 +46,9 @@ sequenceDiagram
     loop 위치 업데이트 주기
         ILocationProvider-->>GPSLocationService: 위치 업데이트 (lat, lon)
        조
+```
 
+### Google Static Map API
 ```mermaid
 sequenceDiagram
     participant UnityCSharp
