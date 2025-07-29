@@ -64,7 +64,9 @@ sequenceDiagram
 
 ```
 
-### Google Static Map API
+
+
+### Google Fit API
 🚀 워크플로우: Google Fit 권한 요청 및 걸음 수 동기화, 갤러리 접근
 Unity에서 Java 클래스를 호출하여 Google Fit 권한 요청 및 센서 등록을 진행합니다.
 (개별 자바 클래스는 안드로이드 스튜디오 외부 라이브러리로 제작해서 aar 파일 형태로 빌드 :: 외부 플러그인)
@@ -187,4 +189,88 @@ classDiagram
     UIController --> ObservableModel
 
 ```
+#### 대략적인 UI 구조 코드 보기 
+<details>
+<summary>UI 코드 일부 보기</summary>
+  
+```csharp
+    public class UIView : MonoBehaviour
+    {
+        public virtual void Initialize(Transform anchor)
+        {
+            //UI Manager에서 초기
+        }
+
+        public virtual void CloseUI(bool isCloseAll = false)
+        {
+            //UIManager를 통해 Close :: (CloseTransform으로 이동)
+        }
+    }
+
+    /// <summary>
+    /// MVC 패턴 : UIController(Controller -> Model)
+    /// </summary>
+    public class UIController<View, Model>  
+        where View : UIView
+        where Model : class
+    {
+        protected Model model;
+        protected View view;
+
+        public UIController(View view, Model model)
+        {
+            this.view = view;
+            this.model = model;
+        }
+
+        /// <summary>
+        /// View Input를 바인드 하기
+        /// </summary>
+        public virtual void BindInputEvents() { }
+
+        /// <summary>
+        /// Model의 값 변경 시 이벤트 바인드
+        /// </summary>
+        public virtual void BindModelToView() { }
+    }
+
+    
+    public class UIManager : Singleton<UIManager>
+    {
+       //대략, Open, Close Transform 잡아서 관리
+        private UIView GetUI<TView>(out bool isAlreadyOpen) where TView : UIView
+        {
+            //처음 생성 시 Resource에서 해당 Type의 UI 프리팹 가져오기(Type과 동일한 이름)
+        }
+
+        public void OpenUI<TController, TView, TModel>(TModel model)
+        where TController : UIController<TView, TModel>
+        where TView : UIView
+        where TModel : class
+        {
+            //GetUI를 한 뒤에 Controller랑 연동
+            //GetController 
+            var controller = UIControllerFactory.GetOrCreateController<TController, TView, TModel>(ui, model);
+            controller.BindInputEvents();
+            controller.BindModelToView();
+
+            frontUI = ui;
+            OpenUIPool.Add(uiType, ui);
+
+        }
+
+        public void CloseUI(UIView ui)
+        {
+            //Remove 시키기
+        }  
+    }
+```
+
+</details>
+📎 [전체 UIView.cs 보기](https://github.com/Kyuarez/POOKOOMIN/blob/main/POOKOOMIN/Assets/02.Scripts/UI/Base/UIView.cs)
+📎 [전체 Controller.cs 보기](https://github.com/Kyuarez/POOKOOMIN/blob/main/POOKOOMIN/Assets/02.Scripts/UI/Base/UIController.cs)
+📎 [전체 UIManager.cs 보기](https://github.com/Kyuarez/POOKOOMIN/blob/main/POOKOOMIN/Assets/02.Scripts/UI/Base/UIManager.cs)
+
+---
+
 ---
